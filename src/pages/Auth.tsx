@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Auth = () => {
   const { signIn, signUp } = useAuth();
@@ -9,23 +10,70 @@ const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [shopName, setShopName] = useState("");
+  const [shopAddress, setShopAddress] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) return;
+    if (isSignUp && (!shopName || !shopAddress)) {
+      toast({ title: "Error", description: "Please fill in all fields", variant: "destructive" });
+      return;
+    }
     setLoading(true);
 
-    const { error } = isSignUp
-      ? await signUp(email, password)
-      : await signIn(email, password);
+    if (isSignUp) {
+      // First create the user account
+      const { error: signUpError } = await signUp(email, password);
+      
+      if (signUpError) {
+        toast({ title: "Error", description: signUpError, variant: "destructive" });
+      } else {
+        // Immediately create the shop after successful signup
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            const { error: shopError } = await supabase
+              .from("shops")
+              .insert({
+                name: shopName,
+                address: shopAddress,
+                owner_id: user.id
+              })
+              .select()
+              .single();
+            
+            if (shopError) {
+              console.error('Failed to create shop:', shopError.message);
+              toast({ 
+                title: "Account created!", 
+                description: "But shop creation failed. Please contact support.",
+                variant: "destructive" 
+              });
+            } else {
+              toast({ 
+                title: "Account created!", 
+                description: "Your shop has been set up successfully. You can now sign in." 
+              });
+            }
+          }
+        } catch (error) {
+          toast({ 
+            title: "Account created!", 
+            description: "Please check your email to confirm, then sign in." 
+          });
+        }
+      }
+    } else {
+      // Regular sign in
+      const { error } = await signIn(email, password);
+      if (error) {
+        toast({ title: "Error", description: error, variant: "destructive" });
+      }
+    }
 
     setLoading(false);
-    if (error) {
-      toast({ title: "Error", description: error, variant: "destructive" });
-    } else if (isSignUp) {
-      toast({ title: "Account created!", description: "Check your email to confirm, or sign in directly." });
-    }
   };
 
   return (
@@ -56,12 +104,40 @@ const Auth = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder="•••••••"
               className="input-lg"
               minLength={6}
               required
             />
           </div>
+          
+          {isSignUp && (
+            <>
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold">Shop Name</label>
+                <input
+                  type="text"
+                  value={shopName}
+                  onChange={(e) => setShopName(e.target.value)}
+                  placeholder="My Mobile Shop"
+                  className="input-lg"
+                  required
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold">Shop Address</label>
+                <input
+                  type="text"
+                  value={shopAddress}
+                  onChange={(e) => setShopAddress(e.target.value)}
+                  placeholder="123 Main St, City, State"
+                  className="input-lg"
+                  required
+                />
+              </div>
+            </>
+          )}
+          
           <Button type="submit" className="w-full h-14 rounded-xl font-bold text-base" disabled={loading}>
             {loading ? "Please wait..." : isSignUp ? "Create Account" : "Sign In"}
           </Button>

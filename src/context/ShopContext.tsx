@@ -21,18 +21,42 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!user) { setShop(null); setLoading(false); return; }
 
-    const fetchShop = async () => {
+    const fetchOrCreateShop = async () => {
       setLoading(true);
-      const { data } = await supabase
+      
+      // First, try to fetch existing shop
+      const { data: existingShop } = await supabase
         .from("shops")
         .select("*")
         .eq("owner_id", user.id)
         .maybeSingle();
-      setShop(data);
+      
+      if (existingShop) {
+        setShop(existingShop);
+      } else {
+        // Create a default shop if none exists
+        const defaultShopName = `${user.email?.split('@')[0] || 'User'}'s Mobile Shop`;
+        const { data: newShop, error } = await supabase
+          .from("shops")
+          .insert({ 
+            name: defaultShopName, 
+            address: "Default address - please update",
+            owner_id: user.id 
+          })
+          .select()
+          .single();
+        
+        if (!error && newShop) {
+          setShop(newShop);
+        } else if (error) {
+          console.error('Failed to create default shop:', error.message);
+        }
+      }
+      
       setLoading(false);
     };
 
-    fetchShop();
+    fetchOrCreateShop();
   }, [user]);
 
   const registerShop = useCallback(async (name: string, address: string) => {
