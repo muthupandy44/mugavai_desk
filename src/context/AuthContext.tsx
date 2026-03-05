@@ -5,7 +5,7 @@ import type { User, Session } from "@supabase/supabase-js";
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  loading: boolean;
+  isLoading: boolean;
   signUp: (email: string, password: string) => Promise<{ error: string | null }>;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
@@ -16,27 +16,33 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let mounted = true;
+    let initialCheckComplete = false;
     
     // Get initial session
     const initializeAuth = async () => {
       try {
+        console.log('🔍 Checking for existing session...');
         const { data: { session } } = await supabase.auth.getSession();
         
         if (mounted) {
+          console.log('✅ Session found:', !!session);
+          console.log('👤 User found:', !!session?.user);
           setSession(session);
           setUser(session?.user ?? null);
-          setLoading(false);
+          initialCheckComplete = true;
+          setIsLoading(false);
         }
       } catch (error) {
-        console.error('Error getting session:', error);
+        console.error('❌ Error getting session:', error);
         if (mounted) {
           setSession(null);
           setUser(null);
-          setLoading(false);
+          initialCheckComplete = true;
+          setIsLoading(false);
         }
       }
     };
@@ -46,9 +52,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (mounted) {
+        console.log('🔄 Auth state changed:', _event);
+        console.log('👤 User in state change:', !!session?.user);
         setSession(session);
         setUser(session?.user ?? null);
-        setLoading(false);
+        // Only set loading to false if initial check is complete
+        if (initialCheckComplete) {
+          setIsLoading(false);
+        }
       }
     });
 
@@ -74,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, isLoading, signUp, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
