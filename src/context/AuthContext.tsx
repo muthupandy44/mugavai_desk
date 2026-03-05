@@ -35,7 +35,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signUp = useCallback(async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin } });
+    const redirectUrl = import.meta.env.PROD ? 'https://mugavai-desk.vercel.app' : window.location.origin;
+    const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: redirectUrl } });
     return { error: error?.message ?? null };
   }, []);
 
