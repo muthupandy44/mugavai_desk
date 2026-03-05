@@ -25,7 +25,7 @@ export function generateRepairBillMessage(data: {
 💰 ${costLabel}: ₹${data.estimatedCost.toLocaleString("en-IN")}
 📋 Status: ${data.status.replace("-", " ").toUpperCase()}
 ━━━━━━━━━━━━━━━━━━
-💳 Pay via UPI: upi://pay?pa=merchant@upi&am=${data.estimatedCost}&cu=INR
+💳 Pay via UPI: upi://pay?pa=test@upi&am=${data.estimatedCost}&cu=INR
 ━━━━━━━━━━━━━━━━━━
 Thank you for choosing Mobile Mart! 🙏`;
 }
@@ -63,6 +63,6 @@ Thank you for choosing Mobile Mart! 🙏`;
   return msg;
 }
 
-export function generateUpiUri(amount: number, upiId: string = "merchant@upi", name: string = "Mobile Mart") {
+export function generateUpiUri(amount: number, upiId: string = "test@upi", name: string = "Mobile Mart") {
   return `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR`;
 }
