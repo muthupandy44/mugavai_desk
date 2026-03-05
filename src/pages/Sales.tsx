@@ -131,7 +131,9 @@ const Sales = () => {
             date={new Date(receiptSale.created_at).toLocaleDateString("en-IN")} itemName={receiptSale.item_name}
             totalAmount={receiptSale.total_amount} paymentMode={receiptSale.payment_mode as "cash" | "emi"}
             downpayment={receiptSale.downpayment ?? undefined} financeProvider={receiptSale.finance_provider ?? undefined}
-            financeBalance={receiptSale.finance_balance ?? undefined} />
+            financeBalance={receiptSale.finance_balance ?? undefined}
+            shopName={sales.find(s => s.id === viewReceipt)?.shop?.name || "Mobile Shop"}
+          />
         </div>
         <div className="space-y-3">
           <Button className="w-full h-14 rounded-xl bg-success hover:bg-success/90 text-success-foreground font-bold text-base" onClick={() => window.open(waLink, "_blank")}>
@@ -145,7 +147,7 @@ const Sales = () => {
 
   return (
     <div className="px-4 pt-6 space-y-5">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <h1 className="text-2xl font-extrabold tracking-tight">Sales</h1>
         <Button className="h-14 px-5 rounded-xl font-bold text-base" onClick={() => { setShowForm(true); setEditSale(null); }}>
           <Plus className="h-5 w-5 mr-1" /> New Sale
@@ -153,13 +155,15 @@ const Sales = () => {
       </div>
 
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-        <input 
-          placeholder="Search by name, phone, or item..." 
-          value={search} 
-          onChange={(e) => setSearch(e.target.value)} 
-          className="input-lg pl-12" 
-        />
+        <div className="flex items-center gap-2">
+          <Search className="h-5 w-5 text-muted-foreground" />
+          <input 
+            placeholder="Search by name, phone, or item..." 
+            value={search} 
+            onChange={(e) => setSearch(e.target.value)} 
+            className="input-lg pl-12 flex-1" 
+          />
+        </div>
       </div>
 
       {/* Quick Filter Chips */}

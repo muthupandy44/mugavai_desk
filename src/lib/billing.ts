@@ -12,11 +12,13 @@ export function generateRepairBillMessage(data: {
   estimatedCost: number;
   status: string;
   isFinalBill?: boolean;
+  shopName?: string;
 }) {
   const billType = data.isFinalBill ? "Final Bill" : "Service Slip";
   const costLabel = data.isFinalBill ? "Final Amount" : "Est. Cost";
+  const shopName = data.shopName || "Mobile Shop";
   
-  return `📱 *MOBILE MART — ${billType}*
+  return `📱 *${shopName.toUpperCase()} — ${billType}*
 ━━━━━━━━━━━━━━━━━━
 📋 Bill ID: ${data.id ?? "N/A"}
 👤 Customer: ${data.customerName}
@@ -27,7 +29,7 @@ export function generateRepairBillMessage(data: {
 ━━━━━━━━━━━━━━━━━━
 💳 Pay via UPI: upi://pay?pa=test@upi&am=${data.estimatedCost}&cu=INR
 ━━━━━━━━━━━━━━━━━━
-Thank you for choosing Mobile Mart! 🙏`;
+Thank you for choosing ${shopName}! 🙏`;
 }
 
 export function generateSalesBillMessage(data: {
@@ -38,8 +40,10 @@ export function generateSalesBillMessage(data: {
   paymentMode: string;
   downpayment?: number;
   financeProvider?: string;
+  shopName?: string;
 }) {
-  let msg = `🛒 *MOBILE MART — Sales Invoice*
+  const shopName = data.shopName || "Mobile Shop";
+  let msg = `🛒 *${shopName.toUpperCase()} — Sales Invoice*
 ━━━━━━━━━━━━━━━━━━
 📋 Bill ID: ${data.id ?? "N/A"}
 👤 Customer: ${data.customerName}
@@ -59,7 +63,7 @@ export function generateSalesBillMessage(data: {
 ━━━━━━━━━━━━━━━━━━
 💳 Pay via UPI: upi://pay?pa=merchant@upi&am=${data.totalAmount}&cu=INR
 ━━━━━━━━━━━━━━━━━━
-Thank you for choosing Mobile Mart! 🙏`;
+Thank you for choosing ${shopName}! 🙏`;
   return msg;
 }
 

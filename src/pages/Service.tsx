@@ -192,6 +192,7 @@ const Service = () => {
             status={receiptOrder.status}
             isFinalBill={isFinalBill}
             finalAmount={isFinalBill ? receiptOrder.estimated_cost : undefined}
+            shopName={services.find(s => s.id === viewReceipt)?.shop?.name || "Mobile Shop"}
           />
         </div>
         <div className="space-y-3">
@@ -206,7 +207,7 @@ const Service = () => {
 
   return (
     <div className="px-4 pt-6 space-y-5">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <h1 className="text-2xl font-extrabold tracking-tight">Services</h1>
         <Button className="h-14 px-5 rounded-xl font-bold text-base" onClick={() => { setShowForm(true); setEditService(null); }}>
           <Plus className="h-5 w-5 mr-1" /> New Repair
@@ -214,13 +215,15 @@ const Service = () => {
       </div>
 
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-        <input 
-          placeholder="Search by name, phone, device, or issue..." 
-          value={search} 
-          onChange={(e) => setSearch(e.target.value)} 
-          className="input-lg pl-12" 
-        />
+        <div className="flex items-center gap-2">
+          <Search className="h-5 w-5 text-muted-foreground" />
+          <input 
+            placeholder="Search by name, phone, device, or issue..." 
+            value={search} 
+            onChange={(e) => setSearch(e.target.value)} 
+            className="input-lg pl-12 flex-1" 
+          />
+        </div>
       </div>
 
       {/* Quick Filter Chips */}

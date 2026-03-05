@@ -10,4 +10,11 @@ console.log('--- SUPABASE DEBUG ---');
 console.log('URL exists:', !!supabaseUrl);
 console.log('Key exists:', !!supabaseAnonKey);
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    storage: localStorage,
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+  }
+});

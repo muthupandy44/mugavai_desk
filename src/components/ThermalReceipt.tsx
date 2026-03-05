@@ -1,5 +1,6 @@
 import { QRCodeSVG } from "qrcode.react";
 import { generateUpiUri } from "@/lib/billing";
+import { useShop } from "@/context/ShopContext";
 
 interface ThermalReceiptProps {
   type: "service" | "sale";
@@ -24,6 +25,7 @@ interface ThermalReceiptProps {
 }
 
 const ThermalReceipt = (props: ThermalReceiptProps) => {
+  const { shop } = useShop();
   const amount = props.type === "service" ? (props.finalAmount ?? props.estimatedCost ?? 0) : (props.totalAmount ?? 0);
   const upiUri = generateUpiUri(amount);
   const isServiceSlip = props.type === "service" && !props.isFinalBill;
@@ -34,7 +36,7 @@ const ThermalReceipt = (props: ThermalReceiptProps) => {
       {/* Bill Info */}
       <div className="text-center mb-3">
         <h1 className="text-lg font-bold tracking-wide" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
-          {isServiceSlip ? "SERVICE SLIP" : isFinalBill ? "FINAL BILL" : "MOBILE MART"}
+          {isServiceSlip ? "SERVICE SLIP" : isFinalBill ? "FINAL BILL" : shop?.name || "Mobile Shop"}
         </h1>
         <p className="text-[10px] text-gray-500 mt-0.5">Your Trusted Mobile Partner</p>
         <div className="border-b-2 border-dashed border-gray-300 my-3" />
@@ -140,7 +142,7 @@ const ThermalReceipt = (props: ThermalReceiptProps) => {
       )}
 
       <div className="border-b-2 border-dashed border-gray-300 my-3" />
-      <p className="text-center text-[10px] text-gray-400">Thank you for visiting Mobile Mart!</p>
+      <p className="text-center text-[10px] text-gray-400">Thank you for visiting {shop?.name || "Mobile Shop"}!</p>
     </div>
   );
 };
