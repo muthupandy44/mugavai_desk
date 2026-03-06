@@ -14,9 +14,61 @@ export function generateRepairBillMessage(data: {
   isFinalBill?: boolean;
   shopName?: string;
 }) {
+  const shopName = data.shopName || "Mobile Shop";
+  
+  // Status-based messaging
+  if (data.status === 'received') {
+    return `📱 *${shopName.toUpperCase()} — Confirmation of Receipt*
+━━━━━━━━━━━━━━━━━━
+📋 Bill ID: ${data.id ?? "N/A"}
+👤 Customer: ${data.customerName}
+📱 Device: ${data.deviceModel}
+🔧 Issue: ${data.issue}
+📋 Status: RECEIVED
+━━━━━━━━━━━━━━━━━━
+Your device has been received and is under diagnosis.
+We'll update you once the assessment is complete.
+━━━━━━━━━━━━━━━━━━
+Thank you for choosing ${shopName}! 🙏`;
+  }
+  
+  if (data.status === 'ready') {
+    return `📱 *${shopName.toUpperCase()} — Ready for Collection*
+━━━━━━━━━━━━━━━━━━
+📋 Bill ID: ${data.id ?? "N/A"}
+👤 Customer: ${data.customerName}
+📱 Device: ${data.deviceModel}
+💰 Total: ₹${data.estimatedCost.toLocaleString("en-IN")}
+📋 Status: READY FOR PICKUP
+━━━━━━━━━━━━━━━━━━
+Your ${data.deviceModel} is fixed and ready for pickup.
+Total amount: ₹${data.estimatedCost.toLocaleString("en-IN")}
+━━━━━━━━━━━━━━━━━━
+💳 Pay via UPI: upi://pay?pa=test@upi&am=${data.estimatedCost}&cu=INR
+━━━━━━━━━━━━━━━━━━
+Thank you for choosing ${shopName}! 🙏`;
+  }
+  
+  if (data.status === 'delivered') {
+    return `📱 *${shopName.toUpperCase()} — Thank You*
+━━━━━━━━━━━━━━━━━━
+📋 Bill ID: ${data.id ?? "N/A"}
+👤 Customer: ${data.customerName}
+📱 Device: ${data.deviceModel}
+💰 Total: ₹${data.estimatedCost.toLocaleString("en-IN")}
+📋 Status: DELIVERED
+━━━━━━━━━━━━━━━━━━
+Your device has been delivered successfully!
+Thank you for trusting ${shopName} with your repair.
+━━━━━━━━━━━━━━━━━━
+View your digital invoice online.
+━━━━━━━━━━━━━━━━━━
+Thank you for choosing ${shopName}! 🙏`;
+  }
+  
+  // Default for in-progress
   const billType = data.isFinalBill ? "Final Bill" : "Service Slip";
   const costLabel = data.isFinalBill ? "Final Amount" : "Est. Cost";
-  const shopName = data.shopName || "Mobile Shop";
   
   return `📱 *${shopName.toUpperCase()} — ${billType}*
 ━━━━━━━━━━━━━━━━━━

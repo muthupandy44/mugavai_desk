@@ -9,6 +9,7 @@ import { ShopDataProvider } from "./context/ShopDataContext";
 import AppLayout from "./components/AppLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index";
+import Invoice from "./components/Invoice";
 import Service from "./pages/Service";
 import Sales from "./pages/Sales";
 import Reports from "./pages/Reports";
@@ -29,6 +30,7 @@ const App = () => (
                 <AppLayout>
                   <Routes>
                     <Route path="/" element={<Index />} />
+                    <Route path="/invoice" element={<Invoice />} />
                     <Route path="/service" element={<Service />} />
                     <Route path="/service/new" element={<Service />} />
                     <Route path="/sales" element={<Sales />} />

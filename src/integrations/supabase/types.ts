@@ -78,11 +78,16 @@ export type Database = {
           device_model: string
           estimated_cost: number
           id: string
+          imei_number: string | null
           issue: string
           phone: string
           shop_id: string
           status: string
           updated_at: string
+          hsn_code: string | null
+          taxable_amount: number | null
+          gst_amount: number | null
+          amount_in_words: string | null
         }
         Insert: {
           bill_id: string
@@ -91,11 +96,16 @@ export type Database = {
           device_model: string
           estimated_cost?: number
           id?: string
+          imei_number?: string | null
           issue: string
           phone: string
           shop_id: string
           status?: string
           updated_at?: string
+          hsn_code?: string | null
+          taxable_amount?: number | null
+          gst_amount?: number | null
+          amount_in_words?: string | null
         }
         Update: {
           bill_id?: string
@@ -104,11 +114,16 @@ export type Database = {
           device_model?: string
           estimated_cost?: number
           id?: string
+          imei_number?: string | null
           issue?: string
           phone?: string
           shop_id?: string
           status?: string
           updated_at?: string
+          hsn_code?: string | null
+          taxable_amount?: number | null
+          gst_amount?: number | null
+          amount_in_words?: string | null
         }
         Relationships: [
           {

@@ -14,7 +14,7 @@ interface ShopDataContextType {
   hasMoreSales: boolean;
   loadMoreServices: () => Promise<void>;
   loadMoreSales: () => Promise<void>;
-  addService: (order: { customerName: string; phone: string; deviceModel: string; issue: string; estimatedCost: number; status: string }) => Promise<ServiceOrder | null>;
+  addService: (order: { customerName: string; phone: string; deviceModel: string; issue: string; estimatedCost: number; status: string; imeiNumber?: string; hsnCode?: string; taxableAmount?: number | null; gstAmount?: number | null; amountInWords?: string }) => Promise<ServiceOrder | null>;
   addSale: (sale: { customerName: string; phone: string; itemName: string; totalAmount: number; paymentMode: string; downpayment?: number; financeProvider?: string; financeBalance?: number }) => Promise<SaleRecord | null>;
   updateService: (id: string, updates: Record<string, unknown>) => Promise<void>;
   deleteService: (id: string) => Promise<void>;
@@ -86,7 +86,7 @@ export function ShopDataProvider({ children }: { children: ReactNode }) {
     setHasMoreSales((salRes.data?.length ?? 0) >= limit);
   }, [hasMoreSales, loading, shop, salesOffset]);
 
-  const addService = useCallback(async (order: { customerName: string; phone: string; deviceModel: string; issue: string; estimatedCost: number; status: string }) => {
+  const addService = useCallback(async (order: { customerName: string; phone: string; deviceModel: string; issue: string; estimatedCost: number; status: string; imeiNumber?: string; hsnCode?: string; taxableAmount?: number | null; gstAmount?: number | null; amountInWords?: string }) => {
     if (!shop) return null;
     const billId = `SRV-${Date.now().toString(36).toUpperCase()}`;
     const { data, error } = await supabase.from("services").insert({
@@ -98,6 +98,11 @@ export function ShopDataProvider({ children }: { children: ReactNode }) {
       issue: order.issue,
       estimated_cost: order.estimatedCost,
       status: order.status,
+      imei_number: order.imeiNumber || null,
+      hsn_code: order.hsnCode || null,
+      taxable_amount: order.taxableAmount || null,
+      gst_amount: order.gstAmount || null,
+      amount_in_words: order.amountInWords || null,
     }).select().single();
     if (!error && data) setServices((prev) => [data, ...prev]);
     return data;

@@ -14,7 +14,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import ThermalReceipt from "@/components/ThermalReceipt";
+import SalesInvoice from "@/components/SalesInvoice";
 import { generateWhatsAppLink, generateSalesBillMessage } from "@/lib/billing";
 import { useSearchParams } from "react-router-dom";
 
@@ -67,6 +67,10 @@ const Sales = () => {
       const sale = sales.find(s => s.id === viewId);
       if (sale) {
         setViewReceipt(viewId);
+        // Auto-trigger print dialog
+        setTimeout(() => {
+          window.print();
+        }, 1500); // Wait 1.5 seconds for content to render
       }
     }
   }, [searchParams, sales]);
@@ -127,11 +131,17 @@ const Sales = () => {
           <h1 className="text-xl font-bold">Receipt — {receiptSale.bill_id}</h1>
         </div>
         <div className="overflow-auto rounded-2xl border border-border shadow-lg">
-          <ThermalReceipt type="sale" id={receiptSale.bill_id} customerName={receiptSale.customer_name} phone={receiptSale.phone}
-            date={new Date(receiptSale.created_at).toLocaleDateString("en-IN")} itemName={receiptSale.item_name}
-            totalAmount={receiptSale.total_amount} paymentMode={receiptSale.payment_mode as "cash" | "emi"}
-            downpayment={receiptSale.downpayment ?? undefined} financeProvider={receiptSale.finance_provider ?? undefined}
-            financeBalance={receiptSale.finance_balance ?? undefined}
+          <SalesInvoice
+            billId={receiptSale.bill_id}
+            customerName={receiptSale.customer_name}
+            phone={receiptSale.phone}
+            date={new Date(receiptSale.created_at).toLocaleDateString("en-IN")}
+            itemName={receiptSale.item_name}
+            totalAmount={receiptSale.total_amount}
+            paymentMode={receiptSale.payment_mode}
+            downpayment={receiptSale.downpayment}
+            financeProvider={receiptSale.finance_provider}
+            financeBalance={receiptSale.finance_balance}
             shopName={sales.find(s => s.id === viewReceipt)?.shop?.name || "Mobile Shop"}
           />
         </div>

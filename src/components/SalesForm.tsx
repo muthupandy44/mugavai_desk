@@ -1,11 +1,12 @@
 import { useState, useMemo } from "react";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft, Check, Printer } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { salesSchema, financeProviders } from "@/lib/schemas";
 import { generateWhatsAppLink, generateSalesBillMessage } from "@/lib/billing";
 import { useShopData } from "@/context";
-import ThermalReceipt from "./ThermalReceipt";
+import A4Invoice from "./Invoice";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,6 +27,7 @@ interface SalesFormProps {
 const SalesForm = ({ onClose, editSale }: SalesFormProps) => {
   const { toast } = useToast();
   const { addSale, updateSale, sales } = useShopData();
+  const navigate = useNavigate();
   const [saved, setSaved] = useState<SaleRecord | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -128,6 +130,14 @@ const SalesForm = ({ onClose, editSale }: SalesFormProps) => {
       if (data) {
         setSaved(data);
         toast({ title: "Sale recorded!", description: `${result.data.itemName} — ₹${result.data.totalAmount?.toLocaleString("en-IN")}` });
+        
+        // Auto-redirect to bill view
+        navigate(`/sales?view=${data.id}`);
+        
+        // Instant print option
+        setTimeout(() => {
+          window.print();
+        }, 1000);
       } else {
         setSubmitting(false);
         toast({ title: "Error saving", description: "Please try again", variant: "destructive" });
@@ -148,17 +158,33 @@ const SalesForm = ({ onClose, editSale }: SalesFormProps) => {
           <h1 className="text-xl font-bold">Receipt</h1>
         </div>
         <div className="overflow-auto rounded-2xl border border-border shadow-lg">
-          <ThermalReceipt type="sale" id={saved.bill_id} customerName={saved.customer_name} phone={saved.phone}
-            date={new Date(saved.created_at).toLocaleDateString("en-IN")} itemName={saved.item_name}
-            totalAmount={saved.total_amount} paymentMode={saved.payment_mode as "cash" | "emi"}
-            downpayment={saved.downpayment ?? undefined} financeProvider={saved.finance_provider ?? undefined}
-            financeBalance={saved.finance_balance ?? undefined} />
+          <A4Invoice
+            customerName={saved.customer_name}
+            phone={saved.phone}
+            billNo={saved.bill_id}
+            date={new Date(saved.created_at).toLocaleDateString("en-IN")}
+            items={[
+              {
+                description: saved.item_name,
+                quantity: 1,
+                rate: saved.total_amount,
+                amount: saved.total_amount
+              }
+            ]}
+            subtotal={saved.total_amount}
+            gst={Math.round(saved.total_amount * 0.18)}
+            total={saved.total_amount + Math.round(saved.total_amount * 0.18)}
+            amountInWords={''} // Will be calculated in component
+          />
         </div>
         <div className="space-y-3">
           <Button className="w-full h-14 rounded-xl bg-success hover:bg-success/90 text-success-foreground font-bold text-base" onClick={() => window.open(waLink, "_blank")}>
             📱 Share on WhatsApp
           </Button>
-          <Button variant="outline" className="w-full h-14 rounded-xl font-semibold text-base" onClick={onClose}>Back to Sales</Button>
+          <Button className="w-full h-14 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-base" onClick={() => window.print()}>
+            🖨️ Print Now
+          </Button>
+          <Button variant="outline" className="w-full h-14 rounded-xl font-semibold text-base" onClick={onClose}>Done</Button>
         </div>
       </div>
     );

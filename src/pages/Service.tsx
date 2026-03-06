@@ -15,7 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import ThermalReceipt from "@/components/ThermalReceipt";
+import ServiceInvoice from "@/components/ServiceInvoice";
 import { generateWhatsAppLink, generateRepairBillMessage } from "@/lib/billing";
 import { useSearchParams } from "react-router-dom";
 
@@ -80,6 +80,10 @@ const Service = () => {
       const service = services.find(s => s.id === viewId);
       if (service) {
         setViewReceipt(viewId);
+        // Auto-trigger print dialog
+        setTimeout(() => {
+          window.print();
+        }, 1500); // Wait 1.5 seconds for content to render
       }
     }
   }, [searchParams, services]);
@@ -180,15 +184,14 @@ const Service = () => {
           <h1 className="text-xl font-bold">{isFinalBill ? 'FINAL BILL' : 'SERVICE SLIP'} — {receiptOrder.bill_id}</h1>
         </div>
         <div className="overflow-auto rounded-2xl border border-border shadow-lg">
-          <ThermalReceipt 
-            type="service" 
-            id={receiptOrder.bill_id} 
-            customerName={receiptOrder.customer_name} 
+          <ServiceInvoice
+            billId={receiptOrder.bill_id}
+            customerName={receiptOrder.customer_name}
             phone={receiptOrder.phone}
-            date={new Date(receiptOrder.created_at).toLocaleDateString("en-IN")} 
+            date={new Date(receiptOrder.created_at).toLocaleDateString("en-IN")}
             deviceModel={receiptOrder.device_model}
-            issue={receiptOrder.issue} 
-            estimatedCost={receiptOrder.estimated_cost} 
+            issue={receiptOrder.issue}
+            estimatedCost={receiptOrder.estimated_cost}
             status={receiptOrder.status}
             isFinalBill={isFinalBill}
             finalAmount={isFinalBill ? receiptOrder.estimated_cost : undefined}

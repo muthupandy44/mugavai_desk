@@ -100,4 +100,71 @@
   .input-lg {
     @apply w-full h-14 rounded-xl border border-border bg-card px-4 text-lg placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring;
   }
+
+  /* Print Styles - Hide Dashboard Navigation */
+  @media print {
+    /* Hide all navigation and layout elements */
+    .bottom-nav,
+    .app-layout,
+    .sidebar,
+    nav,
+    header,
+    footer,
+    .navigation,
+    .menu,
+    .button-group,
+    .fab,
+    .floating-button {
+      display: none !important;
+    }
+    
+    /* Hide any elements with these common classes */
+    .print-hide,
+    .no-print,
+    .screen-only {
+      display: none !important;
+    }
+    
+    /* Ensure only invoice content is visible */
+    body {
+      margin: 0 !important;
+      padding: 0 !important;
+      background: white !important;
+    }
+    
+    /* A4 exact dimensions */
+    @page {
+      size: A4;
+      margin: 12.7mm; /* 0.5 inches */
+    }
+    
+    /* Make sure print containers take full A4 width */
+    .print-mode,
+    .invoice-container,
+    .invoice {
+      width: 210mm !important;
+      height: 297mm !important;
+      margin: 0 !important;
+      padding: 12.7mm !important;
+      box-shadow: none !important;
+      overflow: hidden !important;
+      background: white !important;
+    }
+    
+    /* Ensure text is black and backgrounds are white */
+    * {
+      color: black !important;
+      background: white !important;
+    }
+    
+    /* Keep borders for table structure */
+    table, th, td {
+      border: 1px solid black !important;
+    }
+    
+    /* Hide buttons during print */
+    button, .btn, input[type="button"], input[type="submit"] {
+      display: none !important;
+    }
+  }
 }
